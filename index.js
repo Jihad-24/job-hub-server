@@ -37,7 +37,6 @@ const logger = (req, res, next) => {
 
 const verifyToken = (req, res, next) => {
     const token = req?.cookies?.token;
-
     if (!token) {
         return res.status(401).send({ message: 'unauthorized access' })
     }
@@ -56,6 +55,7 @@ async function run() {
         const userCollection = client.db('marketDB').collection('user');
         const jobsCollection = client.db('marketDB').collection('jobs');
         const myBidsCollection = client.db('marketDB').collection('mybids');
+        const myPostedJobsCollection = client.db('marketDB').collection('mypostedjobs');
 
 
         // job related apis
@@ -63,12 +63,26 @@ async function run() {
             const allJobs = await jobsCollection.find().toArray();
             res.send(allJobs);
         })
+
         app.get('/jobs/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await jobsCollection.findOne(query);
             res.send(result);
         })
+
+        app.get('/mypostedjobs', async (req, res) => {
+            const cursor = myPostedJobsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+
+        app.post('/mypostedjobs', async (req, res) => {
+            const addProduct = req.body;
+            const result = await myPostedJobsCollection.insertOne(addProduct)
+            res.send(result)
+        })
+
 // my bids rlated api
         app.get('/mybids', async (req, res) => {
             const cursor = myBidsCollection.find();
