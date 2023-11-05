@@ -59,17 +59,17 @@ async function run() {
 
 
         // job related apis
-        // app.get('/jobs', async (req, res) => {
-        //     const allJobs = await jobsCollection.find().toArray();
-        //     res.send(allJobs);
-        // })
-        // app.get('/jobs/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: new ObjectId(id) };
-        //     const result = await jobsCollection.findOne(query);
-        //     res.send(result);
-        // })
-
+        app.get('/jobs', async (req, res) => {
+            const allJobs = await jobsCollection.find().toArray();
+            res.send(allJobs);
+        })
+        app.get('/jobs/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await jobsCollection.findOne(query);
+            res.send(result);
+        })
+// my bids rlated api
         // app.get('/mybids', async (req, res) => {
         //     const cursor = myBidsCollection.find();
         //     const result = await cursor.toArray();
