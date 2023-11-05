@@ -70,31 +70,31 @@ async function run() {
             res.send(result);
         })
 // my bids rlated api
-        // app.get('/mybids', async (req, res) => {
-        //     const cursor = myBidsCollection.find();
-        //     const result = await cursor.toArray();
-        //     res.send(result)
-        // })
+        app.get('/mybids', async (req, res) => {
+            const cursor = myBidsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        })
 
-        // app.post('/mybids', async (req, res) => {
-        //     const addProduct = req.body;
-        //     const result = await myBidsCollection.insertOne(addProduct)
-        //     res.send(result)
-        // })
+        app.post('/mybids', async (req, res) => {
+            const addProduct = req.body;
+            const result = await myBidsCollection.insertOne(addProduct)
+            res.send(result)
+        })
 
-        // app.patch('/mybids/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const filter = { _id: new ObjectId(id) };
-        //     const updatedBooking = req.body;
-        //     console.log(updatedBooking);
-        //     const updateDoc = {
-        //         $set: {
-        //             status: updatedBooking.status,
-        //         },
-        //     };
-        //     const result = await myBidsCollection.updateOne(filter, updateDoc)
-        //     res.send(result);
-        // })
+        app.patch('/mybids/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updatedBooking = req.body;
+            console.log(updatedBooking);
+            const updateDoc = {
+                $set: {
+                    status: updatedBooking.status,
+                },
+            };
+            const result = await myBidsCollection.updateOne(filter, updateDoc)
+            res.send(result);
+        })
 
         app.delete('/mybids/:id', async (req, res) => {
             const id = req.params.id;
