@@ -77,13 +77,47 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/mypostedjobs/:id', async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: new ObjectId(id) };
+            const result = await myPostedJobsCollection.findOne(quary);
+            res.send(result);
+        })
+
         app.post('/mypostedjobs', async (req, res) => {
             const addProduct = req.body;
             const result = await myPostedJobsCollection.insertOne(addProduct)
             res.send(result)
         })
 
-// my bids rlated api
+        app.put('/mypostedjobs/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedJob = req.body;
+            const product = {
+                $set: {
+                    email: updatedJob.email,
+                    jobtitle: updatedJob.jobtitle,
+                    deadline: updatedJob.deadline,
+                    description: updatedJob.description,
+                    miniprice: updatedJob.miniprice,
+                    maxprice: updatedJob.maxprice,
+                    category: updatedJob.category
+                }
+            }
+            const result = await myPostedJobsCollection.updateOne(filter, product, options)
+            res.send(result);
+        })
+
+        app.delete('/mypostedjobs/:id', async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: new ObjectId(id) };
+            const result = await myPostedJobsCollection.deleteOne(quary);
+            res.send(result);
+        })
+
+        // my bids rlated api
         app.get('/mybids', async (req, res) => {
             const cursor = myBidsCollection.find();
             const result = await cursor.toArray();
@@ -122,7 +156,7 @@ async function run() {
             const email = req.params.email;
             const user = await userCollection.findOne({ email: email });
             res.send(user);
-        });        
+        });
 
         app.post('/user', async (req, res) => {
             const user = req.body;
