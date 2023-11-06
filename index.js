@@ -124,6 +124,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/mybids/:id', async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: new ObjectId(id) };
+            const result = await myBidsCollection.findOne(quary);
+            res.send(result);
+        })
+
         app.post('/mybids', async (req, res) => {
             const addProduct = req.body;
             const result = await myBidsCollection.insertOne(addProduct)
