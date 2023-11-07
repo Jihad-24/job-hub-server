@@ -140,11 +140,11 @@ async function run() {
         app.patch('/mybids/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
-            const updatedBooking = req.body;
-            console.log(updatedBooking);
+            const updatedBid = req.body;
+            // console.log(updatedBooking);
             const updateDoc = {
                 $set: {
-                    status: updatedBooking.status,
+                    status: updatedBid.status,
                 },
             };
             const result = await myBidsCollection.updateOne(filter, updateDoc)
@@ -167,9 +167,16 @@ async function run() {
 
         app.post('/user', async (req, res) => {
             const user = req.body;
-            const result = await userCollection.insertOne(user);
-            res.send(result);
-        })
+            const existingUser = await userCollection.findOne({ email: user?.email });
+
+            if (existingUser) {
+                return res.status(200).json({ message: 'User already exists', user: existingUser });
+            } else {
+                const result = await userCollection.insertOne(user);
+                return res.status(201).json({ message: 'User registered successfully', user: result });
+            }
+        });
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
