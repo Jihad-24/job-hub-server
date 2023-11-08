@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 // middlewre
 app.use(cors({
     origin: [
-        'http://localhost:5173',
+        'https://job-hub-mine.netlify.app/',
     ],
     credentials: true
 }));
