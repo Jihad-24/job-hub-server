@@ -62,7 +62,7 @@ async function run() {
         app.post('/jwt', logger, async (req, res) => {
             const user = req.body;
             console.log('user for token', user);
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: true,
@@ -78,7 +78,7 @@ async function run() {
         })
 
         // job related apis
-        app.get('/jobs', verifyToken, async (req, res) => {
+        app.get('/jobs', async (req, res) => {
             const allJobs = await jobsCollection.find().toArray();
             res.send(allJobs);
         })
