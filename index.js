@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://job-hub-mine.netlify.app/'
+        'https://job-hub-mine.netlify.app'
     ],
     credentials: true
 }));
