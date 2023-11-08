@@ -58,20 +58,39 @@ async function run() {
         const myPostedJobsCollection = client.db('marketDB').collection('mypostedjobs');
 
 
+        // token api
+        app.post('/jwt', logger, async (req, res) => {
+            const user = req.body;
+            console.log('user for token', user);
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none'
+            })
+                .send({ success: true });
+        })
+
+        app.post('/logout', async (req, res) => {
+            const user = req.body;
+            console.log('logging out', user);
+            res.clearCookie('token', { maxAge: 0 }).send({ success: true });
+        })
+
         // job related apis
-        app.get('/jobs', async (req, res) => {
+        app.get('/jobs', verifyToken, async (req, res) => {
             const allJobs = await jobsCollection.find().toArray();
             res.send(allJobs);
         })
 
-        app.get('/jobs/:id', async (req, res) => {
+        app.get('/jobs/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await jobsCollection.findOne(query);
             res.send(result);
         })
 
-        app.get('/mypostedjobs', async (req, res) => {
+        app.get('/mypostedjobs', verifyToken, async (req, res) => {
             const cursor = myPostedJobsCollection.find();
             const result = await cursor.toArray();
             res.send(result)
@@ -85,8 +104,8 @@ async function run() {
         })
 
         app.post('/mypostedjobs', async (req, res) => {
-            const addProduct = req.body;
-            const result = await myPostedJobsCollection.insertOne(addProduct)
+            const addJob = req.body;
+            const result = await myPostedJobsCollection.insertOne(addJob)
             res.send(result)
         })
 
@@ -95,7 +114,7 @@ async function run() {
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
             const updatedJob = req.body;
-            const product = {
+            const job = {
                 $set: {
                     email: updatedJob.email,
                     jobtitle: updatedJob.jobtitle,
@@ -106,7 +125,7 @@ async function run() {
                     category: updatedJob.category
                 }
             }
-            const result = await myPostedJobsCollection.updateOne(filter, product, options)
+            const result = await myPostedJobsCollection.updateOne(filter, job, options)
             res.send(result);
         })
 
@@ -118,11 +137,16 @@ async function run() {
         })
 
         // my bids rlated api
-        app.get('/mybids', async (req, res) => {
-            const cursor = myBidsCollection.find();
+
+        app.get('/mybids',verifyToken, async (req, res) => {
+            const customStatusOrder = ['pending','in progress', 'complete', 'reject'];
+            const cursor = myBidsCollection.find({
+                status: { $in: customStatusOrder },
+            }).sort({ status: 1 });
             const result = await cursor.toArray();
-            res.send(result)
-        })
+            res.send(result);
+        });
+
 
         app.get('/mybids/:id', async (req, res) => {
             const id = req.params.id;
@@ -167,15 +191,9 @@ async function run() {
 
         app.post('/user', async (req, res) => {
             const user = req.body;
-            const existingUser = await userCollection.findOne({ email: user?.email });
-
-            if (existingUser) {
-                return res.status(200).json({ message: 'User already exists', user: existingUser });
-            } else {
-                const result = await userCollection.insertOne(user);
-                return res.status(201).json({ message: 'User registered successfully', user: result });
-            }
-        });
+            const result = await userCollection.insertOne(user);
+            res.send(result);
+        })
 
 
         // Send a ping to confirm a successful connection
