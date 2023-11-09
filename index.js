@@ -139,7 +139,7 @@ async function run() {
 
         // my bids rlated api
 
-        app.get('/mybids', async (req, res) => {
+        app.get('/mybids',verifyToken, async (req, res) => {
             const customStatusOrder = ['pending','in progress', 'complete', 'reject'];
             const cursor = myBidsCollection.find({
                 status: { $in: customStatusOrder },
