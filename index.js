@@ -84,7 +84,7 @@ async function run() {
             res.send(allJobs);
         })
 
-        app.get('/jobs/:id', async (req, res) => {
+        app.get('/jobs/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await jobsCollection.findOne(query);
@@ -139,7 +139,7 @@ async function run() {
 
         // my bids rlated api
 
-        app.get('/mybids',verifyToken, async (req, res) => {
+        app.get('/mybids', async (req, res) => {
             const customStatusOrder = ['pending','in progress', 'complete', 'reject'];
             const cursor = myBidsCollection.find({
                 status: { $in: customStatusOrder },
